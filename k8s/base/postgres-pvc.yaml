@@ -1,0 +1,14 @@
+# PersistentVolumeClaim for PostgreSQL data storage
+# Requests persistent storage for database files to survive pod restarts
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: taskapi
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path  # k3d default storage class
+  resources:
+    requests:
+      storage: 1Gi

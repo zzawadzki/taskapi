@@ -1,0 +1,21 @@
+# Local development overlay
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Reference base configuration
+resources:
+  - ../../base
+
+# Patches for local development
+patches:
+  # Set ImagePullPolicy to Never for locally built images
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+    target:
+      kind: Deployment
+      name: task-api
+
+commonLabels:
+  environment: local

@@ -1,0 +1,55 @@
+name: taskapi
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: taskapi-postgres
+    environment:
+      POSTGRES_DB: taskapi_db
+      POSTGRES_USER: taskapi_user
+      POSTGRES_PASSWORD: local_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskapi_user -d taskapi_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - taskapi-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskapi-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/taskapi_db
+      - SPRING_DATASOURCE_USERNAME=taskapi_user
+      - SPRING_DATASOURCE_PASSWORD=local_dev_password
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=86400000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - taskapi-network
+
+networks:
+  taskapi-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local

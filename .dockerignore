@@ -1,0 +1,10 @@
+target/
+.git/
+.idea/
+.mvn/
+*.md
+.env
+.env.*
+docker-compose.yml
+*.log
+.DS_Store

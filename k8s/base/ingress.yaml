@@ -1,0 +1,23 @@
+# Ingress for Task API application
+# Provides external access to the application via HTTP
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: taskapi-ingress
+  namespace: taskapi
+  annotations:
+    # Disable SSL redirect for local development
+    ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: traefik  # k3d default ingress controller
+  rules:
+  - host: taskapi.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: taskapi-service
+            port:
+              number: 80
