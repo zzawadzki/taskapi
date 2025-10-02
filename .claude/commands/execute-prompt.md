@@ -1,0 +1,1 @@
+Read the prompt from ./.ai/prompts/{{filename}} and execute.
